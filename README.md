@@ -2,6 +2,10 @@
 
 **Know when a recruiter actually opens your resume.**
 
+<img src="docs/demo.gif" width="100%" alt="A LinkedIn preview bot and a real visitor open the same short link. Both are redirected, but only the human is counted as an open.">
+
+**[Download the full 60-second walkthrough (MP4, 15 MB, with sound)](docs/pingback-workflow.mp4?raw=true)**
+
 When you apply to 50 places, you send the same resume link 50 times and hear back from three.
 You never find out whether the other 47 even looked. Pingback gives every application its own
 short link, so you can see which company opened your resume, when, and how often.
