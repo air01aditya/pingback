@@ -1,0 +1,2 @@
+# Copy to .dev.vars for local development. Generate a value with `npm run secret`.
+SETUP_SECRET=replace-with-at-least-32-random-characters
