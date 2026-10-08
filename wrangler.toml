@@ -8,6 +8,5 @@ directory = "./public"
 [[d1_databases]]
 binding = "DB"
 database_name = "pingback"
-# Replaced with the real id from `wrangler d1 create pingback` before the first deploy.
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "7d9725aa-87b9-4fa8-a557-88a13c0ccbec"
 migrations_dir = "migrations"
