@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Set up this device · Pingback</title>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <h1>Set up this device</h1>
+      <p class="lead">Only for the owner of this Pingback. You do this once per phone or laptop.</p>
+
+      <form id="setup-form" class="card">
+        <div id="secret-field">
+          <label for="secret">Setup key</label>
+          <input id="secret" type="password" autocomplete="off" required />
+          <p class="muted small">Or open your setup link and this fills in by itself.</p>
+        </div>
+
+        <label for="name">Name this device</label>
+        <input id="name" maxlength="60" required />
+
+        <p id="error" class="error hidden"></p>
+        <p class="actions"><button type="submit">Remember this device</button></p>
+      </form>
+    </main>
+    <script type="module" src="/setup.js"></script>
+  </body>
+</html>

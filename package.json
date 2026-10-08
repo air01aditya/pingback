@@ -1,0 +1,22 @@
+{
+  "name": "pingback",
+  "version": "2.0.0",
+  "private": true,
+  "description": "One resume link that tells you how many times it was really opened.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:migrate:local": "wrangler d1 migrations apply pingback --local",
+    "db:migrate:remote": "wrangler d1 migrations apply pingback --remote",
+    "secret": "node -e \"console.log(require('crypto').randomBytes(32).toString('base64url'))\"",
+    "test": "node --test --disable-warning=ExperimentalWarning",
+    "deploy": "wrangler deploy"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "devDependencies": {
+    "wrangler": "^4.148.0"
+  }
+}

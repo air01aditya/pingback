@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Dashboard · Pingback</title>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <h1>Pingback</h1>
+      <p class="lead" id="subtitle">Loading…</p>
+
+      <section id="not-set-up" class="card hidden">
+        <h2>This device isn't set up</h2>
+        <p class="muted">Open your setup link on this device once, and it will be remembered.</p>
+        <a class="button" href="/setup">Set up this device</a>
+      </section>
+
+      <div id="dashboard" class="hidden">
+        <section class="card">
+          <h2>Your resume link</h2>
+          <div class="row">
+            <span class="link-box" id="link"></span>
+            <button id="copy" type="button">Copy</button>
+          </div>
+          <p class="muted small" id="no-resume">Add your resume below before sharing this link.</p>
+        </section>
+
+        <section class="card">
+          <p><span class="big-number" id="opens">0</span> <span class="muted" id="opens-label">opens</span></p>
+          <p class="muted" id="last-open"></p>
+          <div class="chart" id="chart" aria-label="Opens per day, last 30 days"></div>
+          <div class="chart-labels muted small"><span id="chart-start"></span><span>Today</span></div>
+          <p class="muted small section-gap" id="ignored"></p>
+        </section>
+
+        <section class="card">
+          <h2>Recent opens</h2>
+          <p class="muted" id="no-opens">No opens yet.</p>
+          <ul class="list" id="recent"></ul>
+        </section>
+
+        <section class="card">
+          <h2>Resume</h2>
+          <form id="resume-form">
+            <label for="resume-url">Google Drive link (shared as "Anyone with the link")</label>
+            <div class="row">
+              <input id="resume-url" type="url" placeholder="https://drive.google.com/file/d/…" required />
+              <button type="submit">Save</button>
+            </div>
+            <p class="muted small" id="resume-status"></p>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Remembered devices</h2>
+          <ul class="list" id="devices"></ul>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
