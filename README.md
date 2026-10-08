@@ -4,11 +4,13 @@
 
 <img src="docs/demo.gif" width="100%" alt="A LinkedIn preview bot and a real visitor open the same short link. Both are redirected, but only the human is counted as an open.">
 
-**[Download the full 60-second walkthrough (MP4, 15 MB, with sound)](docs/pingback-workflow.mp4?raw=true)**
+**[Download the full 60-second walkthrough (MP4, with sound)](https://github.com/air01aditya/pingback/releases/download/v1.0.0/pingback-workflow.mp4)**
 
-When you apply to 50 places, you send the same resume link 50 times and hear back from three.
-You never find out whether the other 47 even looked. Pingback gives every application its own
-short link, so you can see which company opened your resume, when, and how often.
+You apply to 50 roles and hear back from 3. The other 47 go silent, and you can't tell whether
+your resume was rejected or never even opened.
+
+Pingback gives each application its own short link to your resume. When someone at that
+company clicks it, you see it: which company, when, and how many times.
 
 ## The problem with "opened"
 
@@ -126,3 +128,7 @@ npm test
 - **Bot detection is user-agent based.** It catches the common previewers, but some corporate
   email scanners pretend to be a normal browser and will still count as an open.
 - **SQLite** is fine for one user. Moving to PostgreSQL only means rewriting the services layer.
+
+## License
+
+[MIT](LICENSE)
