@@ -2,6 +2,8 @@
 
 **One link to your resume that tells you how many times it was really opened.**
 
+**Live:** [pingback.air01aditya.workers.dev](https://pingback.air01aditya.workers.dev). Try the demo link there and watch the counter go up.
+
 You apply to 50 roles and hear back from 3. The other 47 go silent, and you can't tell whether
 your resume was rejected or never even opened.
 
