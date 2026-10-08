@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pingback</title>
+    <meta name="description" content="One resume link that tells you how many times it was really opened." />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <h1>Pingback</h1>
+      <p class="lead">One link to your resume that tells you how many times it was really opened.</p>
+
+      <section class="card">
+        <h2>How it works</h2>
+        <ol class="steps">
+          <li>Your resume stays on Google Drive.</li>
+          <li>You share one link, <code>/cv</code>, everywhere you apply.</li>
+          <li>
+            Every open is counted. Link previews from LinkedIn, WhatsApp and Slack are ignored, and so
+            are your own clicks.
+          </li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <h2>Try it</h2>
+        <p class="muted">
+          Open the demo link on any phone or laptop. It goes to a sample resume, and this counter goes up.
+        </p>
+        <a class="button" href="/demo" target="_blank" rel="noopener">Open the demo link</a>
+        <p class="counter"><b id="demo-count">–</b> <span class="muted">demo opens</span></p>
+      </section>
+
+      <footer class="muted">
+        Open source on <a href="https://github.com/air01aditya/pingback">GitHub</a>
+      </footer>
+    </main>
+    <script type="module" src="/landing.js"></script>
+  </body>
+</html>
