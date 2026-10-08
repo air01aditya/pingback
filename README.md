@@ -1,133 +1,112 @@
 # Pingback
 
-**Know when a recruiter actually opens your resume.**
-
-<img src="docs/demo.gif" width="100%" alt="A LinkedIn preview bot and a real visitor open the same short link. Both are redirected, but only the human is counted as an open.">
-
-**[Download the full 60-second walkthrough (MP4, with sound)](https://github.com/air01aditya/pingback/releases/download/v1.0.0/pingback-workflow.mp4)**
+**One link to your resume that tells you how many times it was really opened.**
 
 You apply to 50 roles and hear back from 3. The other 47 go silent, and you can't tell whether
 your resume was rejected or never even opened.
 
-Pingback gives each application its own short link to your resume. When someone at that
-company clicks it, you see it: which company, when, and how many times.
+Pingback gives you one permanent link, `/cv`, that you share everywhere you apply. Whoever opens
+it lands on your Google Drive resume, and you see how many times it was opened, and when.
 
-## The problem with "opened"
+## Why counting clicks isn't enough
 
-Paste any link into LinkedIn, Slack, WhatsApp or most email clients and a bot fetches it right
-away to build a preview card, before any person clicks. A plain click counter would say
-"opened" for every link you've sent, which makes it useless.
+Paste a link into LinkedIn, WhatsApp, Slack or most email clients and a bot fetches it right away
+to build a preview card, before any person clicks. A plain click counter would say "opened" the
+moment you send it. Your own test clicks would count too.
 
-Pingback records every hit but classifies it by user agent. Preview bots are still redirected
-and logged, but they're kept out of the "opens" count. The dashboard shows both numbers, so you
-can tell "LinkedIn rendered a preview" apart from "someone at the company clicked it".
+Pingback sorts every visit into one of three kinds and only counts the first:
 
-## Features
+| Kind    | How it's detected                                   |
+|---------|-----------------------------------------------------|
+| `human` | everything else                                     |
+| `bot`   | known preview and crawler user agents, or `HEAD` requests |
+| `owner` | the request carries one of your remembered devices' cookies |
 
-- One short link per application, labelled with the company and role
-- Redirects with `302` so every visit reaches the server (a `301` would get cached by the browser)
-- Separates human opens from link-preview bots
-- Shows an activity log for each link: when it was opened and from what browser
-- Dashboard shows how many applications have been opened
+## How it works
 
-## Tech stack
+```
+                 ┌──────── one Cloudflare Worker ────────┐
+Anyone ─────────▶  GET /cv   → 302 to your resume          │
+                 │             → then record the visit     │
+You ────────────▶  /app      → dashboard (your devices)    │
+Visitor ────────▶  /         → landing page + demo link    │
+                 └───────────────────┬─────────────────────┘
+                                     ▼
+                       D1 (SQLite): settings · clicks · devices
+```
 
-| Layer    | Choice                                   |
-|----------|------------------------------------------|
-| Backend  | Node.js, Express 5                       |
-| Database | SQLite (better-sqlite3)                  |
-| Frontend | React 19, Vite                           |
-| Tests    | Node's built-in test runner + Supertest  |
+- **Redirect first, record second.** The visit is saved with `ctx.waitUntil` after the response
+  has gone out, so a slow or failing database can never delay or break the click.
+- **`302`, not `301`.** Browsers cache a `301` and would skip the server on later visits.
+- **Only the owner can change anything.** The public can open `/cv` and `/demo`, nothing else, so
+  the site can't be used to disguise someone else's links.
+- **No passwords.** Each of your devices is set up once with a setup link. It gets a random token
+  in an `HttpOnly`, `SameSite=Lax` cookie, and only its SHA-256 hash is stored. Any device can be
+  removed from the dashboard.
+- **Cross-site requests are rejected.** Any request that changes data must come from the same
+  origin.
+- **Zero runtime dependencies.** The Worker is plain JavaScript with its own small router. Pages
+  are plain HTML, CSS and JS with a strict Content Security Policy.
+- **Minimal data about visitors.** Browser type and approximate city and country, from
+  Cloudflare. No IP addresses.
 
 ## Project structure
 
 ```
-pingback/
-├── backend/
-│   ├── src/
-│   │   ├── index.js            # starts the server
-│   │   ├── app.js              # middleware + route mounting
-│   │   ├── config/env.js       # all environment config in one place
-│   │   ├── db/                 # connection + schema.sql
-│   │   ├── routes/             # URL → controller mapping
-│   │   ├── controllers/        # request validation + responses
-│   │   ├── services/           # database queries
-│   │   ├── middleware/         # 404 + central error handler
-│   │   └── utils/              # code generator, bot detection, HttpError
-│   └── tests/
-└── frontend/
-    └── src/
-        ├── api/                # fetch wrapper for the backend
-        ├── components/
-        └── utils/
+src/
+├── index.js          # entry point: same-origin check, routing, errors
+├── router.js         # small method + path router
+├── handlers/         # HTTP layer: redirect, setup, stats, resume, devices
+├── services/         # data layer: every SQL query lives here
+└── lib/              # auth, validation, bot and browser detection, HTTP helpers
+public/               # landing page, dashboard, device setup, demo resume
+migrations/           # D1 schema
+tests/                # node:test against an in-memory SQLite stand-in for D1
 ```
 
-Requests flow **route → controller → service → database**. Controllers deal with HTTP
-(validating input, choosing status codes) and services deal with data, so the SQL never
-touches `req`/`res`.
-
-## Database
-
-```
-links                          clicks
-─────────────                  ──────────────────────
-id          PK                 id          PK
-code        UNIQUE             link_id     FK → links.id (ON DELETE CASCADE)
-target_url                     clicked_at
-label                          user_agent
-created_at                     referrer
-                               is_bot
-```
-
-Clicks are stored as individual rows rather than a counter on `links`, so the activity log
-and the human/bot split can both be computed from one table. `clicks.link_id` is indexed
-because every dashboard query joins on it.
+Handlers deal with HTTP (parsing input, status codes, cookies). Services deal with data. Neither
+knows about the other's concerns.
 
 ## API
 
-| Method | Route             | Description                               |
-|--------|-------------------|-------------------------------------------|
-| GET    | `/api/links`      | All links with open counts                |
-| GET    | `/api/links/:id`  | One link plus its latest 100 clicks       |
-| POST   | `/api/links`      | Create a link (`{ label, targetUrl }`)    |
-| DELETE | `/api/links/:id`  | Delete a link and its click history       |
-| GET    | `/:code`          | Record the visit and redirect             |
-| GET    | `/api/health`     | Health check                              |
-
-Errors always come back as `{ "error": "message" }` with a matching status code
-(`400` for bad input, `404` for missing links, `500` for anything unexpected).
+| Method | Route               | Access   | Description                                  |
+|--------|---------------------|----------|----------------------------------------------|
+| GET    | `/cv`               | public   | Redirect to the resume and record the visit  |
+| GET    | `/demo`             | public   | Redirect to the sample resume (own counter)  |
+| GET    | `/api/demo-stats`   | public   | Demo open count                              |
+| POST   | `/api/setup`        | setup key | Remember this device                        |
+| GET    | `/api/me`           | device   | Current device, renews its cookie            |
+| GET    | `/api/stats`        | device   | Opens, last open, last 30 days of opens      |
+| PUT    | `/api/resume`       | device   | Change where `/cv` points                    |
+| GET    | `/api/devices`      | device   | List remembered devices                      |
+| DELETE | `/api/devices/:id`  | device   | Remove a device                              |
 
 ## Running locally
 
-Requires Node.js 22+.
+Requires Node.js 22.13 or later.
 
 ```bash
-# backend — runs on http://localhost:4000
-cd backend
 npm install
-npm run dev
-
-# frontend — runs on http://localhost:5173, proxies /api to the backend
-cd frontend
-npm install
-npm run dev
+cp .dev.vars.example .dev.vars    # then put the output of `npm run secret` in it
+npm run db:migrate:local
+npm run dev                       # http://localhost:8787
 ```
 
-Copy `backend/.env.example` to `backend/.env` to change the port, public base URL or
-database path.
+Open `http://localhost:8787/setup#key=<your SETUP_SECRET>` to remember this device, then add
+your resume link on the dashboard at `/app`.
 
 ```bash
-cd backend
 npm test
 ```
 
-## Known limitations
+## Limitations
 
-- **No accounts yet.** It's single-user, and anyone who can reach the API can see the links.
-  Authentication is the next thing to add.
-- **Bot detection is user-agent based.** It catches the common previewers, but some corporate
-  email scanners pretend to be a normal browser and will still count as an open.
-- **SQLite** is fine for one user. Moving to PostgreSQL only means rewriting the services layer.
+- **It counts opens, not people.** A recruiter who opens the link twice, or forwards it, adds
+  more than one.
+- **Bot detection is user-agent based.** A scanner that pretends to be a normal browser will
+  count as a human.
+- **The free `workers.dev` address** doesn't carry your name. A custom domain fixes that, but
+  costs money.
 
 ## License
 
