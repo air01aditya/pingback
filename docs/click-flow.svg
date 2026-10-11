@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" width="1200" height="500" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#71717A"/>
+    </marker>
+    <marker id="y" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#DFE104"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="500" fill="#09090B"/>
+  <text x="48" y="56" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15" letter-spacing="3">FLOW</text>
+  <text x="48" y="100" fill="#FAFAFA" font-size="38" font-weight="800" letter-spacing="-1">ONE CLICK ON <tspan fill="#DFE104">/CV</tspan></text>
+
+  <!-- top row: the click is answered first -->
+  <rect x="48" y="150" width="200" height="76" fill="none" stroke="#3F3F46" stroke-width="2"/>
+  <text x="72" y="197" fill="#FAFAFA" font-size="24" font-weight="800">CLICK</text>
+
+  <rect x="330" y="150" width="200" height="76" fill="none" stroke="#DFE104" stroke-width="2"/>
+  <text x="354" y="197" fill="#DFE104" font-family="Consolas, 'Courier New', monospace" font-size="26" font-weight="700">/cv</text>
+
+  <rect x="700" y="150" width="300" height="76" fill="#DFE104"/>
+  <text x="724" y="186" fill="#000" font-size="24" font-weight="800">RESUME OPENS</text>
+  <text x="724" y="211" fill="#000" font-family="Consolas, 'Courier New', monospace" font-size="14" letter-spacing="2">INSTANTLY</text>
+
+  <path d="M248 188 L326 188" stroke="#71717A" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+  <path d="M530 188 L696 188" stroke="#DFE104" stroke-width="2.5" fill="none" marker-end="url(#y)"/>
+  <text x="586" y="176" fill="#DFE104" font-family="Consolas, 'Courier New', monospace" font-size="16" font-weight="700">302</text>
+
+  <!-- then the visit is recorded -->
+  <path d="M430 226 L430 296" stroke="#71717A" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#a)"/>
+  <text x="444" y="268" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="14" letter-spacing="2">AFTER</text>
+
+  <rect x="330" y="300" width="200" height="76" fill="none" stroke="#3F3F46" stroke-width="2"/>
+  <text x="354" y="347" fill="#FAFAFA" font-size="24" font-weight="800">RECORD</text>
+
+  <path d="M530 338 L590 338" stroke="#71717A" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+  <rect x="594" y="300" width="150" height="76" fill="none" stroke="#3F3F46" stroke-width="2"/>
+  <text x="618" y="347" fill="#FAFAFA" font-size="24" font-weight="800">WHO?</text>
+
+  <g stroke-width="2.5" fill="none">
+    <path d="M744 338 C780 338 780 266 818 266" stroke="#DFE104" marker-end="url(#y)"/>
+    <path d="M744 338 L818 338" stroke="#71717A" marker-end="url(#a)"/>
+    <path d="M744 338 C780 338 780 410 818 410" stroke="#71717A" marker-end="url(#a)"/>
+  </g>
+
+  <rect x="822" y="240" width="330" height="52" fill="#DFE104"/>
+  <text x="842" y="274" fill="#000" font-size="21" font-weight="800">HUMAN</text>
+  <text x="1132" y="274" fill="#000" font-family="Consolas, 'Courier New', monospace" font-size="15" font-weight="700" text-anchor="end" letter-spacing="2">COUNTED ✓</text>
+
+  <rect x="822" y="312" width="330" height="52" fill="none" stroke="#3F3F46" stroke-width="2"/>
+  <text x="842" y="346" fill="#A1A1AA" font-size="21" font-weight="800" text-decoration="line-through">PREVIEW BOT</text>
+  <text x="1132" y="346" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15" text-anchor="end" letter-spacing="2">IGNORED ✕</text>
+
+  <rect x="822" y="384" width="330" height="52" fill="none" stroke="#3F3F46" stroke-width="2"/>
+  <text x="842" y="418" fill="#A1A1AA" font-size="21" font-weight="800">YOU</text>
+  <text x="1132" y="418" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15" text-anchor="end" letter-spacing="2">SKIPPED ✕</text>
+
+  <text x="48" y="466" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15">→ the recruiter never waits for tracking</text>
+</svg>
