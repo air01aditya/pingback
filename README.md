@@ -1,114 +1,116 @@
+<div align="center">
+
+<img src="docs/hero.gif" alt="Pingback: did they open it?" width="100%" />
+
 # Pingback
 
-**One link to your resume that tells you how many times it was really opened.**
+### You sent your resume. Did they open it?
 
-**Live:** [pingback.air01aditya.workers.dev](https://pingback.air01aditya.workers.dev). Try the demo link there and watch the counter go up.
+One permanent link to your resume that counts **real** opens,
+and ignores link-preview bots and your own clicks.
 
-You apply to 50 roles and hear back from 3. The other 47 go silent, and you can't tell whether
-your resume was rejected or never even opened.
+**[Try the live demo →](https://pingback.air01aditya.workers.dev)**
 
-Pingback gives you one permanent link, `/cv`, that you share everywhere you apply. Whoever opens
-it lands on your Google Drive resume, and you see how many times it was opened, and when.
+![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)
+![D1](https://img.shields.io/badge/D1-SQLite-003B57?logo=sqlite&logoColor=white)
+![Dependencies](https://img.shields.io/badge/runtime%20deps-0-DFE104)
+![Tests](https://img.shields.io/badge/tests-node%3Atest-339933?logo=node.js&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-## Why counting clicks isn't enough
+</div>
 
-Paste a link into LinkedIn, WhatsApp, Slack or most email clients and a bot fetches it right away
-to build a preview card, before any person clicks. A plain click counter would say "opened" the
-moment you send it. Your own test clicks would count too.
+---
 
-Pingback sorts every visit into one of three kinds and only counts the first:
+## The problem
 
-| Kind    | How it's detected                                   |
-|---------|-----------------------------------------------------|
-| `human` | everything else                                     |
-| `bot`   | known preview and crawler user agents, or `HEAD` requests |
-| `owner` | the request carries one of your remembered devices' cookies |
+You apply to 50 roles and hear back from 3. The other 47 go silent, and you can't tell
+whether your resume was rejected or never opened at all.
 
-## How it works
+A normal click counter won't tell you either. The moment you paste a link into LinkedIn,
+WhatsApp or Slack, a **bot opens it first** to build a preview card. So the counter says
+"opened" before any person has seen it.
 
-```
-                 ┌──────── one Cloudflare Worker ────────┐
-Anyone ─────────▶  GET /cv   → 302 to your resume          │
-                 │             → then record the visit     │
-You ────────────▶  /app      → dashboard (your devices)    │
-Visitor ────────▶  /         → landing page + demo link    │
-                 └───────────────────┬─────────────────────┘
-                                     ▼
-                       D1 (SQLite): settings · clicks · devices
-```
+## What Pingback does
 
-- **Redirect first, record second.** The visit is saved with `ctx.waitUntil` after the response
-  has gone out, so a slow or failing database can never delay or break the click.
-- **`302`, not `301`.** Browsers cache a `301` and would skip the server on later visits.
-- **Only the owner can change anything.** The public can open `/cv` and `/demo`, nothing else, so
-  the site can't be used to disguise someone else's links.
-- **No passwords.** Each of your devices is set up once with a setup link. It gets a random token
-  in an `HttpOnly`, `SameSite=Lax` cookie, and only its SHA-256 hash is stored. Any device can be
-  removed from the dashboard.
-- **Cross-site requests are rejected.** Any request that changes data must come from the same
-  origin.
-- **Zero runtime dependencies.** The Worker is plain JavaScript with its own small router. Pages
-  are plain HTML, CSS and JS with a strict Content Security Policy.
-- **Minimal data about visitors.** Browser type and approximate city and country, from
-  Cloudflare. No IP addresses.
+Share one link everywhere you apply: `pingback.air01aditya.workers.dev/cv`
+
+It opens your Google Drive resume instantly, and every visit is sorted:
+
+| Visit | Example | Counted? |
+|---|---|---|
+| **Human** | a recruiter in Chrome | ✅ counted |
+| **Preview bot** | `LinkedInBot/1.0`, `WhatsApp`, `HEAD` requests | ❌ ignored |
+| **You** | your own devices, testing the link | ❌ skipped |
+
+Your dashboard shows the real count, the last open and a 30-day chart.
+
+## Under the hood
+
+<img src="docs/click-flow.svg" alt="One click on /cv" width="100%" />
+
+- **Redirect first, count second.** The resume opens with a `302` straight away. The visit is
+  saved afterwards with `ctx.waitUntil`, so a slow database can never slow down or break a click.
+- **`302`, not `301`.** Browsers cache `301`s and would skip the server on the next visit.
+- **No passwords.** Each device is set up once and gets a random token in an `HttpOnly`,
+  `SameSite=Lax` cookie. Only its SHA-256 hash is stored.
+- **Locked down.** The public can only open `/cv` and `/demo`. Cross-site writes are rejected,
+  and the pages run under a strict Content Security Policy.
+- **Zero runtime dependencies.** Plain JavaScript, its own small router, and about 500 lines
+  of server code.
+- **Private by default.** It stores browser type and rough city or country only. No IP addresses.
+
+<img src="docs/architecture.svg" alt="How Pingback fits together" width="100%" />
 
 ## Project structure
 
+<img src="docs/structure.svg" alt="Code layers" width="100%" />
+
 ```
 src/
-├── index.js          # entry point: same-origin check, routing, errors
-├── router.js         # small method + path router
-├── handlers/         # HTTP layer: redirect, setup, stats, resume, devices
-├── services/         # data layer: every SQL query lives here
-└── lib/              # auth, validation, bot and browser detection, HTTP helpers
-public/               # landing page, dashboard, device setup, demo resume
-migrations/           # D1 schema
-tests/                # node:test against an in-memory SQLite stand-in for D1
+├── index.js        # entry: same-origin check, routing, errors
+├── router.js       # small method + path router
+├── handlers/       # HTTP only: redirect, setup, stats, resume, devices
+├── services/       # SQL only: every query lives here
+└── lib/            # auth, validation, bot + browser detection
+public/             # landing page, dashboard, setup, demo resume
+migrations/         # D1 schema
+tests/              # node:test against an in-memory SQLite stand-in for D1
 ```
-
-Handlers deal with HTTP (parsing input, status codes, cookies). Services deal with data. Neither
-knows about the other's concerns.
 
 ## API
 
-| Method | Route               | Access   | Description                                  |
-|--------|---------------------|----------|----------------------------------------------|
-| GET    | `/cv`               | public   | Redirect to the resume and record the visit  |
-| GET    | `/demo`             | public   | Redirect to the sample resume (own counter)  |
-| GET    | `/api/demo-stats`   | public   | Demo open count                              |
-| POST   | `/api/setup`        | setup key | Remember this device                        |
-| GET    | `/api/me`           | device   | Current device, renews its cookie            |
-| GET    | `/api/stats`        | device   | Opens, last open, last 30 days of opens      |
-| PUT    | `/api/resume`       | device   | Change where `/cv` points                    |
-| GET    | `/api/devices`      | device   | List remembered devices                      |
-| DELETE | `/api/devices/:id`  | device   | Remove a device                              |
+| Method | Route | Access | What it does |
+|---|---|---|---|
+| GET | `/cv` | public | Redirect to the resume, then record the visit |
+| GET | `/demo` | public | Same, for the sample resume |
+| GET | `/api/demo-stats` | public | Demo open count |
+| POST | `/api/setup` | setup key | Remember this device |
+| GET | `/api/me` | device | Current device, renews its cookie |
+| GET | `/api/stats` | device | Opens, last open, last 30 days |
+| PUT | `/api/resume` | device | Change where `/cv` points |
+| GET | `/api/devices` | device | List remembered devices |
+| DELETE | `/api/devices/:id` | device | Remove a device |
 
-## Running locally
+## Run it yourself
 
-Requires Node.js 22.13 or later.
+Needs Node.js 22.13+ and a free Cloudflare account.
 
 ```bash
 npm install
-cp .dev.vars.example .dev.vars    # then put the output of `npm run secret` in it
+cp .dev.vars.example .dev.vars     # paste the output of `npm run secret`
 npm run db:migrate:local
-npm run dev                       # http://localhost:8787
-```
-
-Open `http://localhost:8787/setup#key=<your SETUP_SECRET>` to remember this device, then add
-your resume link on the dashboard at `/app`.
-
-```bash
+npm run dev                        # http://localhost:8787
 npm test
 ```
 
-## Limitations
+Open `http://localhost:8787/setup#key=<SETUP_SECRET>` once to remember your device, then add
+your resume link at `/app`.
 
-- **It counts opens, not people.** A recruiter who opens the link twice, or forwards it, adds
-  more than one.
-- **Bot detection is user-agent based.** A scanner that pretends to be a normal browser will
-  count as a human.
-- **The free `workers.dev` address** doesn't carry your name. A custom domain fixes that, but
-  costs money.
+## Honest limitations
+
+- **It counts opens, not people.** One recruiter opening it twice counts as two.
+- **Bot detection uses the user agent.** A scanner pretending to be Chrome counts as human.
+- **The free `workers.dev` address** doesn't have your name in it. A custom domain fixes that.
 
 ## License
 
