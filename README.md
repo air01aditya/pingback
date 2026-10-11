@@ -5,19 +5,11 @@
 # Pingback
 
 One link to your resume that tells you if it was really opened.
-
-**[Live demo](https://pingback.air01aditya.workers.dev)**
-
-</div>
-
-## How it works
-
-You share one link, `/cv`. It opens your resume straight away, then counts the visit.
 Link-preview bots and your own clicks don't count.
 
-<img src="docs/click-flow.svg" alt="One click on /cv" width="100%" />
+**[Live demo](https://pingback.air01aditya.workers.dev)** · Cloudflare Workers · D1 · no runtime dependencies
 
-Built with Cloudflare Workers and D1. No runtime dependencies.
+</div>
 
 ## Run it yourself
 
