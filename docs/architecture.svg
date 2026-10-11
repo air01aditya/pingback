@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="1200" height="560" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#71717A"/>
+    </marker>
+    <marker id="y" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#DFE104"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="560" fill="#09090B"/>
+  <text x="48" y="56" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15" letter-spacing="3">ARCHITECTURE</text>
+  <text x="48" y="100" fill="#FAFAFA" font-size="38" font-weight="800" letter-spacing="-1">HOW IT FITS <tspan fill="#DFE104">TOGETHER</tspan></text>
+
+  <!-- who comes in -->
+  <g font-weight="800" font-size="22">
+    <rect x="48" y="150" width="210" height="76" fill="none" stroke="#DFE104" stroke-width="2"/>
+    <text x="70" y="184" fill="#FAFAFA">RECRUITER</text>
+    <text x="70" y="209" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="400">opens /cv</text>
+
+    <rect x="48" y="270" width="210" height="76" fill="none" stroke="#3F3F46" stroke-width="2"/>
+    <text x="70" y="304" fill="#FAFAFA">YOU</text>
+    <text x="70" y="329" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="400">your devices</text>
+
+    <rect x="48" y="390" width="210" height="76" fill="none" stroke="#3F3F46" stroke-width="2"/>
+    <text x="70" y="424" fill="#FAFAFA">VISITOR</text>
+    <text x="70" y="449" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="400">tries the demo</text>
+  </g>
+
+  <!-- the worker -->
+  <rect x="330" y="140" width="420" height="340" fill="none" stroke="#3F3F46" stroke-width="2"/>
+  <text x="354" y="176" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15" letter-spacing="3">CLOUDFLARE WORKER</text>
+
+  <g font-size="18">
+    <rect x="354" y="196" width="372" height="54" fill="#DFE104"/>
+    <text x="374" y="230" fill="#000" font-family="Consolas, 'Courier New', monospace" font-weight="700">/cv</text>
+    <text x="460" y="230" fill="#000" font-weight="700">redirect, then record</text>
+
+    <rect x="354" y="264" width="372" height="54" fill="none" stroke="#3F3F46" stroke-width="2"/>
+    <text x="374" y="298" fill="#FAFAFA" font-family="Consolas, 'Courier New', monospace" font-weight="700">/app</text>
+    <text x="460" y="298" fill="#A1A1AA">your dashboard</text>
+
+    <rect x="354" y="332" width="372" height="54" fill="none" stroke="#3F3F46" stroke-width="2"/>
+    <text x="374" y="366" fill="#FAFAFA" font-family="Consolas, 'Courier New', monospace" font-weight="700">/</text>
+    <text x="460" y="366" fill="#A1A1AA">landing + demo</text>
+
+    <rect x="354" y="400" width="372" height="54" fill="none" stroke="#3F3F46" stroke-width="2"/>
+    <text x="374" y="434" fill="#FAFAFA" font-family="Consolas, 'Courier New', monospace" font-weight="700">/api</text>
+    <text x="460" y="434" fill="#A1A1AA">data as JSON</text>
+  </g>
+
+  <g stroke-width="2.5" fill="none">
+    <path d="M258 188 C300 188 300 223 350 223" stroke="#DFE104" marker-end="url(#y)"/>
+    <path d="M258 308 C300 308 300 291 350 291" stroke="#71717A" marker-end="url(#a)"/>
+    <path d="M258 428 C300 428 300 359 350 359" stroke="#71717A" marker-end="url(#a)"/>
+    <path d="M726 223 C790 223 790 188 846 188" stroke="#DFE104" marker-end="url(#y)"/>
+    <path d="M750 380 L846 380" stroke="#71717A" marker-end="url(#a)"/>
+  </g>
+  <text x="770" y="196" fill="#DFE104" font-family="Consolas, 'Courier New', monospace" font-size="16" font-weight="700">302</text>
+
+  <!-- where things live -->
+  <rect x="850" y="150" width="302" height="76" fill="none" stroke="#DFE104" stroke-width="2"/>
+  <text x="872" y="184" fill="#FAFAFA" font-size="22" font-weight="800">GOOGLE DRIVE</text>
+  <text x="872" y="209" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="14">your resume</text>
+
+  <rect x="850" y="270" width="302" height="210" fill="none" stroke="#3F3F46" stroke-width="2"/>
+  <text x="872" y="306" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15" letter-spacing="3">D1 · SQLITE</text>
+  <g font-family="Consolas, 'Courier New', monospace" font-size="18" fill="#FAFAFA">
+    <rect x="872" y="324" width="258" height="40" fill="#27272A"/>
+    <text x="890" y="350">settings</text>
+    <rect x="872" y="372" width="258" height="40" fill="#27272A"/>
+    <text x="890" y="398">clicks</text>
+    <rect x="872" y="420" width="258" height="40" fill="#27272A"/>
+    <text x="890" y="446">devices</text>
+  </g>
+
+  <text x="48" y="526" fill="#A1A1AA" font-family="Consolas, 'Courier New', monospace" font-size="15">public: /  /demo  /cv   ·   everything else: your devices only</text>
+</svg>
