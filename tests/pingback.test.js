@@ -83,6 +83,19 @@ test("preview bots are redirected but not counted", async () => {
   assert.equal(data.lastOpen, null);
 });
 
+test("the dashboard still loads if updating last seen fails", async () => {
+  const app = await appWithResume();
+  const prepare = app.env.DB.prepare;
+  app.env.DB.prepare = (sql) => {
+    if (!sql.startsWith("UPDATE devices")) return prepare(sql);
+    const failing = { bind: () => failing, run: async () => { throw new Error("D1 write limit reached"); } };
+    return failing;
+  };
+
+  const res = await app.call("GET", "/api/stats", { cookie: app.cookie });
+  assert.equal(res.status, 200);
+});
+
 test("the owner's own clicks are skipped", async () => {
   const app = await appWithResume();
 
