@@ -22,7 +22,12 @@ export function createRouter() {
         const params = {};
         const matches = route.parts.every((part, i) => {
           if (part.startsWith(":")) {
-            params[part.slice(1)] = decodeURIComponent(segments[i]);
+            // A broken escape like "%E0" can't be a real id, so treat it as no match.
+            try {
+              params[part.slice(1)] = decodeURIComponent(segments[i]);
+            } catch {
+              return false;
+            }
             return true;
           }
           return part === segments[i];

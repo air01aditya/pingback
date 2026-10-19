@@ -140,3 +140,9 @@ test("unknown routes return 404", async () => {
   assert.deepEqual(await api.json(), { error: "Not found" });
   assert.equal((await app.call("GET", "/nothing")).status, 404);
 });
+
+test("a broken escape in a device id returns 404, not a crash", async () => {
+  const app = createApp();
+  const res = await app.call("DELETE", "/api/devices/%E0");
+  assert.equal(res.status, 404);
+});
