@@ -83,6 +83,18 @@ test("preview bots are redirected but not counted", async () => {
   assert.equal(data.lastOpen, null);
 });
 
+test("browser prefetches are redirected but not counted", async () => {
+  const app = await appWithResume();
+
+  const res = await app.call("GET", "/cv", { extraHeaders: { "sec-purpose": "prefetch;prerender" } });
+  assert.equal(res.status, 302);
+  await app.call("GET", "/cv", { extraHeaders: { purpose: "prefetch" } });
+
+  const data = await stats(app);
+  assert.equal(data.opens, 0);
+  assert.equal(data.botsIgnored, 2);
+});
+
 test("the dashboard still loads if updating last seen fails", async () => {
   const app = await appWithResume();
   const prepare = app.env.DB.prepare;

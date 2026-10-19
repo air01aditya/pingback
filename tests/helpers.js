@@ -34,8 +34,8 @@ function fakeD1() {
 export function createApp() {
   const env = { DB: fakeD1(), SETUP_SECRET: SECRET };
 
-  async function call(method, path, { body, cookie, userAgent = CHROME, origin = ORIGIN, cf } = {}) {
-    const headers = { "user-agent": userAgent };
+  async function call(method, path, { body, cookie, userAgent = CHROME, origin = ORIGIN, cf, extraHeaders } = {}) {
+    const headers = { "user-agent": userAgent, ...extraHeaders };
     if (cookie) headers.cookie = cookie;
     if (method !== "GET" && method !== "HEAD" && origin) headers.origin = origin;
     if (body !== undefined) headers["content-type"] = "application/json";
