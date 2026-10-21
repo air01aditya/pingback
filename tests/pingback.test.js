@@ -171,3 +171,23 @@ test("a broken escape in a device id returns 404, not a crash", async () => {
   const res = await app.call("DELETE", "/api/devices/%E0");
   assert.equal(res.status, 404);
 });
+
+test("?src= records where an open came from", async () => {
+  const app = await appWithResume();
+
+  await app.call("GET", "/cv?src=linkedin");
+  await app.call("GET", "/cv?src=LinkedIn");
+  await app.call("GET", "/cv?src=resume");
+  await app.call("GET", "/cv?src=<script>");
+  const res = await app.call("GET", "/cv");
+  assert.equal(res.headers.get("location"), RESUME, "?src= must not change where the link goes");
+
+  const data = await stats(app);
+  assert.equal(data.opens, 5);
+  assert.deepEqual(data.sources, [
+    { source: "linkedin", opens: 2 },
+    { source: "direct", opens: 1 },
+    { source: "other", opens: 1 },
+    { source: "resume", opens: 1 },
+  ]);
+});

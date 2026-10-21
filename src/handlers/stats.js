@@ -1,5 +1,5 @@
 import { json } from "../lib/http.js";
-import { countByKind, humanOpensSince, lastHumanOpen } from "../services/clicks.js";
+import { countByKind, humanOpensBySource, humanOpensSince, lastHumanOpen } from "../services/clicks.js";
 import { getResumeUrl } from "../services/settings.js";
 
 const DAYS = 30;
@@ -9,10 +9,11 @@ function isoDaysAgo(days) {
 }
 
 export async function owner({ request, env }) {
-  const [counts, lastOpen, recent, resumeUrl] = await Promise.all([
+  const [counts, lastOpen, recent, sources, resumeUrl] = await Promise.all([
     countByKind(env.DB, "cv"),
     lastHumanOpen(env.DB, "cv"),
     humanOpensSince(env.DB, "cv", isoDaysAgo(DAYS)),
+    humanOpensBySource(env.DB, "cv"),
     getResumeUrl(env.DB),
   ]);
 
@@ -24,6 +25,7 @@ export async function owner({ request, env }) {
     ownClicksSkipped: counts.owner,
     lastOpen,
     recent,
+    sources,
   });
 }
 

@@ -1,7 +1,7 @@
-export function recordClick(db, { link, kind, browser, city, country }) {
+export function recordClick(db, { link, kind, browser, city, country, source = null }) {
   return db
-    .prepare("INSERT INTO clicks (link, kind, browser, city, country) VALUES (?, ?, ?, ?, ?)")
-    .bind(link, kind, browser, city, country)
+    .prepare("INSERT INTO clicks (link, kind, browser, city, country, source) VALUES (?, ?, ?, ?, ?, ?)")
+    .bind(link, kind, browser, city, country, source)
     .run();
 }
 
@@ -41,4 +41,19 @@ export function lastHumanOpen(db, link) {
     )
     .bind(link)
     .first();
+}
+
+// Clicks without ?src= are counted as "direct".
+export async function humanOpensBySource(db, link) {
+  const { results } = await db
+    .prepare(
+      `SELECT COALESCE(source, 'direct') AS source, COUNT(*) AS opens
+       FROM clicks
+       WHERE link = ? AND kind = 'human'
+       GROUP BY COALESCE(source, 'direct')
+       ORDER BY opens DESC, source`
+    )
+    .bind(link)
+    .all();
+  return results;
 }

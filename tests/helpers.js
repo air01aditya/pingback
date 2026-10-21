@@ -1,8 +1,12 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import worker from "../src/index.js";
 
-const MIGRATION = readFileSync(new URL("../migrations/0001_init.sql", import.meta.url), "utf8");
+const MIGRATIONS_DIR = new URL("../migrations/", import.meta.url);
+const MIGRATIONS = readdirSync(MIGRATIONS_DIR)
+  .filter((name) => name.endsWith(".sql"))
+  .sort()
+  .map((name) => readFileSync(new URL(name, MIGRATIONS_DIR), "utf8"));
 export const SECRET = "test-secret-that-is-at-least-32-characters";
 export const ORIGIN = "https://pingback.test";
 
@@ -12,7 +16,7 @@ export const LINKEDIN = "LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpCl
 // Just enough of Cloudflare D1's API, backed by Node's built-in SQLite.
 function fakeD1() {
   const sqlite = new DatabaseSync(":memory:");
-  sqlite.exec(MIGRATION);
+  for (const sql of MIGRATIONS) sqlite.exec(sql);
 
   const statement = (sql, params = []) => ({
     bind: (...values) => statement(sql, values),
