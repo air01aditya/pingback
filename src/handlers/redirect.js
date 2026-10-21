@@ -1,6 +1,7 @@
 import { getResumeUrl } from "../services/settings.js";
 import { recordClick } from "../services/clicks.js";
 import { classifyVisit } from "../lib/visitor.js";
+import { sourceFromRequest } from "../lib/source.js";
 import { redirect, text } from "../lib/http.js";
 
 export async function resume({ request, env, ctx }) {
@@ -20,7 +21,7 @@ export function demo({ request, env, ctx }) {
 async function track(env, request, link) {
   try {
     const visit = await classifyVisit(env, request);
-    await recordClick(env.DB, { link, ...visit });
+    await recordClick(env.DB, { link, source: sourceFromRequest(request), ...visit });
   } catch (err) {
     console.error("Could not record click", err);
   }

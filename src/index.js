@@ -6,6 +6,7 @@ import * as setup from "./handlers/setup.js";
 import * as stats from "./handlers/stats.js";
 import * as resume from "./handlers/resume.js";
 import * as devices from "./handlers/devices.js";
+import { clearVisitorsBefore } from "./services/clicks.js";
 
 // Pages, CSS and JS in public/ are served by Cloudflare before this code runs.
 // Only the routes below reach the Worker.
@@ -33,5 +34,12 @@ export default {
     } catch (err) {
       return errorResponse(err, isApi);
     }
+  },
+
+  // Runs on the cron in wrangler.toml.
+  async scheduled(event, env) {
+    const before = new Date(event.scheduledTime - 30 * 86_400_000).toISOString().slice(0, 19) + "Z";
+    const cleared = await clearVisitorsBefore(env.DB, before);
+    console.log(`Cleared ${cleared} visitor hashes older than 30 days`);
   },
 };

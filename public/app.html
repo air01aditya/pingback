@@ -31,10 +31,20 @@
 
         <section class="card">
           <p><span class="big-number" id="opens">0</span> <span class="muted" id="opens-label">opens</span></p>
+          <p class="muted" id="visitors" title="Without a login, a phone and a laptop count as two."></p>
           <p class="muted" id="last-open"></p>
           <div class="chart" id="chart" aria-label="Opens per day, last 30 days"></div>
           <div class="chart-labels muted small"><span id="chart-start"></span><span>Today</span></div>
           <p class="muted small section-gap" id="ignored"></p>
+        </section>
+
+        <section class="card">
+          <h2>Where opens came from</h2>
+          <p class="muted small">
+            Add <code>?src=</code> to the link where you share it, like <code>/cv?src=linkedin</code>.
+            Works with resume, linkedin, naukri, github and email.
+          </p>
+          <ul class="list" id="sources"></ul>
         </section>
 
         <section class="card">
