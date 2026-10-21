@@ -22,9 +22,30 @@ A normal click counter calls that an "open". Pingback doesn't.
 
 - **One permanent link**, `/cv`, that opens your Google Drive resume straight away
 - **Counts real people only:** link-preview bots and your own clicks are ignored
+- **Shows where opens came from:** add `?src=linkedin` (or resume, naukri, github, email) to the link
+- **Counts about how many people:** unique visitors, without saving IP addresses
 - **Private dashboard** with the count, the last open and a 30-day chart
 - **No passwords:** each of your devices is set up once with a setup link
 - **Free to run** on Cloudflare's free plan, with zero runtime dependencies
+
+## What it stores
+
+Pingback keeps as little as it can about the people who open your link.
+
+| Saved for each open | Never saved |
+|---|---|
+| Time | The IP address |
+| City and country (from Cloudflare) | The full user agent |
+| Browser name, like "Chrome on Android" | Cookies on visitors' devices |
+| Where the link was shared (`?src=`) | |
+| A daily visitor code | |
+
+The visitor code is an HMAC of the IP address and browser, keyed with your secret and today's date.
+It's only used to count unique visitors. It changes every day, so visits on different days can't be
+linked, and a nightly job clears it after 30 days. The open itself stays, so totals don't drop.
+
+The data answers one question: was my resume opened, by about how many people, and from where.
+It isn't shared with anyone.
 
 ## Getting started
 
