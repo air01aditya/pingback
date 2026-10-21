@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CHROME, LINKEDIN, SECRET, createApp } from "./helpers.js";
 import { visitorHash } from "../src/lib/visitorHash.js";
+import worker from "../src/index.js";
 
 const RESUME = "https://drive.google.com/file/d/abc123/view";
 
@@ -227,4 +228,20 @@ test("the visitor hash changes every day and depends on the secret", async () =>
   assert.equal(a, await visitorHash(SECRET, request, monday));
   assert.notEqual(a, await visitorHash(SECRET, request, tuesday));
   assert.notEqual(a, await visitorHash("another-secret-that-is-32-characters!", request, monday));
+});
+
+test("the daily cleanup clears visitor hashes older than 30 days but keeps the opens", async () => {
+  const app = await appWithResume();
+  const insert = "INSERT INTO clicks (link, kind, clicked_at, visitor) VALUES ('cv', 'human', ?, ?)";
+  await app.env.DB.prepare(insert).bind("2026-09-01T10:00:00Z", "old-hash").run();
+  await app.env.DB.prepare(insert).bind("2026-10-20T10:00:00Z", "new-hash").run();
+
+  await worker.scheduled({ scheduledTime: Date.parse("2026-10-21T21:30:00Z") }, app.env);
+
+  const { results } = await app.env.DB.prepare("SELECT clicked_at, visitor FROM clicks ORDER BY clicked_at").all();
+  assert.deepEqual(
+    results.map((row) => row.visitor),
+    [null, "new-hash"]
+  );
+  assert.equal((await stats(app)).opens, 2, "opens are kept");
 });

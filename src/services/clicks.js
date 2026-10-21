@@ -70,3 +70,12 @@ export async function uniqueVisitorsSince(db, link, since) {
     .first();
   return row.total;
 }
+
+// Keeps the open itself, so totals don't drop; only the hash is removed.
+export async function clearVisitorsBefore(db, before) {
+  const result = await db
+    .prepare("UPDATE clicks SET visitor = NULL WHERE visitor IS NOT NULL AND clicked_at < ?")
+    .bind(before)
+    .run();
+  return result.meta.changes;
+}
