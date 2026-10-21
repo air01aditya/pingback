@@ -86,6 +86,31 @@ function renderRecent(opens) {
   );
 }
 
+const SOURCE_NAMES = {
+  direct: "No ?src=",
+  resume: "Resume",
+  linkedin: "LinkedIn",
+  naukri: "Naukri",
+  github: "GitHub",
+  email: "Email",
+  other: "Other",
+};
+
+function renderSources(sources) {
+  $("sources").replaceChildren(
+    ...sources.map(({ source, opens }) => {
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      name.textContent = SOURCE_NAMES[source] || source;
+      const count = document.createElement("span");
+      count.className = "muted";
+      count.textContent = `${opens} ${opens === 1 ? "open" : "opens"}`;
+      li.append(name, count);
+      return li;
+    })
+  );
+}
+
 function renderStats(stats) {
   $("link").textContent = stats.link;
   $("no-resume").classList.toggle("hidden", Boolean(stats.resumeUrl));
@@ -104,6 +129,7 @@ function renderStats(stats) {
     `${stats.ownClicksSkipped} of your own ${stats.ownClicksSkipped === 1 ? "click" : "clicks"} skipped`;
 
   renderChart(stats.recent);
+  renderSources(stats.sources);
   renderRecent(stats.recent);
 }
 
