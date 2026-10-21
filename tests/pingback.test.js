@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CHROME, LINKEDIN, SECRET, createApp } from "./helpers.js";
+import { visitorHash } from "../src/lib/visitorHash.js";
 
 const RESUME = "https://drive.google.com/file/d/abc123/view";
 
@@ -190,4 +191,40 @@ test("?src= records where an open came from", async () => {
     { source: "other", opens: 1 },
     { source: "resume", opens: 1 },
   ]);
+});
+
+test("unique visitors count each device once, and the raw IP is never stored", async () => {
+  const app = await appWithResume();
+  const phone = { extraHeaders: { "cf-connecting-ip": "203.0.113.7" } };
+  const laptop = { extraHeaders: { "cf-connecting-ip": "198.51.100.20" } };
+
+  await app.call("GET", "/cv", phone);
+  await app.call("GET", "/cv", phone);
+  await app.call("GET", "/cv", laptop);
+  await app.call("GET", "/cv", { ...phone, userAgent: LINKEDIN });
+
+  const data = await stats(app);
+  assert.equal(data.opens, 3);
+  assert.equal(data.visitors, 2);
+
+  const { results } = await app.env.DB.prepare("SELECT * FROM clicks").all();
+  for (const row of results) {
+    assert.ok(!JSON.stringify(row).includes("203.0.113.7"), "raw IP must not be saved");
+  }
+  const bot = results.find((row) => row.kind === "bot");
+  assert.equal(bot.visitor, null, "bots don't get a visitor hash");
+});
+
+test("the visitor hash changes every day and depends on the secret", async () => {
+  const request = new Request("https://pingback.test/cv", {
+    headers: { "cf-connecting-ip": "203.0.113.7", "user-agent": CHROME },
+  });
+  const monday = new Date("2026-10-19T10:00:00Z");
+  const tuesday = new Date("2026-10-20T10:00:00Z");
+
+  const a = await visitorHash(SECRET, request, monday);
+  assert.match(a, /^[0-9a-f]{64}$/);
+  assert.equal(a, await visitorHash(SECRET, request, monday));
+  assert.notEqual(a, await visitorHash(SECRET, request, tuesday));
+  assert.notEqual(a, await visitorHash("another-secret-that-is-32-characters!", request, monday));
 });

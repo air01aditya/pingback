@@ -1,7 +1,7 @@
-export function recordClick(db, { link, kind, browser, city, country, source = null }) {
+export function recordClick(db, { link, kind, browser, city, country, source = null, visitor = null }) {
   return db
-    .prepare("INSERT INTO clicks (link, kind, browser, city, country, source) VALUES (?, ?, ?, ?, ?, ?)")
-    .bind(link, kind, browser, city, country, source)
+    .prepare("INSERT INTO clicks (link, kind, browser, city, country, source, visitor) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    .bind(link, kind, browser, city, country, source, visitor)
     .run();
 }
 
@@ -56,4 +56,17 @@ export async function humanOpensBySource(db, link) {
     .bind(link)
     .all();
   return results;
+}
+
+// The hash changes every day, so this counts each device once per day.
+export async function uniqueVisitorsSince(db, link, since) {
+  const row = await db
+    .prepare(
+      `SELECT COUNT(DISTINCT visitor) AS total
+       FROM clicks
+       WHERE link = ? AND kind = 'human' AND visitor IS NOT NULL AND clicked_at >= ?`
+    )
+    .bind(link, since)
+    .first();
+  return row.total;
 }

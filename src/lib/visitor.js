@@ -1,6 +1,7 @@
 import { detectBot } from "./detectBot.js";
 import { describeBrowser } from "./browser.js";
 import { deviceFromRequest } from "./auth.js";
+import { visitorHash } from "./visitorHash.js";
 
 // Browsers load some links before anyone clicks (prefetch, prerender) and say so in a header.
 function isPrefetch(request) {
@@ -20,5 +21,6 @@ export async function classifyVisit(env, request) {
   // Real browsers send GET when someone clicks a link; HEAD comes from link checkers.
   if (request.method === "HEAD" || isPrefetch(request) || detectBot(userAgent)) return { ...visit, kind: "bot" };
   if (await deviceFromRequest(env, request)) return { ...visit, kind: "owner" };
-  return { ...visit, kind: "human" };
+  // Only real visitors get a hash; bots and the owner don't need one.
+  return { ...visit, kind: "human", visitor: await visitorHash(env.SETUP_SECRET, request) };
 }

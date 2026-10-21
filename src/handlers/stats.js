@@ -1,5 +1,11 @@
 import { json } from "../lib/http.js";
-import { countByKind, humanOpensBySource, humanOpensSince, lastHumanOpen } from "../services/clicks.js";
+import {
+  countByKind,
+  humanOpensBySource,
+  humanOpensSince,
+  lastHumanOpen,
+  uniqueVisitorsSince,
+} from "../services/clicks.js";
 import { getResumeUrl } from "../services/settings.js";
 
 const DAYS = 30;
@@ -9,11 +15,13 @@ function isoDaysAgo(days) {
 }
 
 export async function owner({ request, env }) {
-  const [counts, lastOpen, recent, sources, resumeUrl] = await Promise.all([
+  const since = isoDaysAgo(DAYS);
+  const [counts, lastOpen, recent, sources, visitors, resumeUrl] = await Promise.all([
     countByKind(env.DB, "cv"),
     lastHumanOpen(env.DB, "cv"),
-    humanOpensSince(env.DB, "cv", isoDaysAgo(DAYS)),
+    humanOpensSince(env.DB, "cv", since),
     humanOpensBySource(env.DB, "cv"),
+    uniqueVisitorsSince(env.DB, "cv", since),
     getResumeUrl(env.DB),
   ]);
 
@@ -26,6 +34,7 @@ export async function owner({ request, env }) {
     lastOpen,
     recent,
     sources,
+    visitors,
   });
 }
 
