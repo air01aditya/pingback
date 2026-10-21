@@ -51,7 +51,10 @@ export function requireDevice(handler) {
   return async (context) => {
     const device = await deviceFromRequest(context.env, context.request);
     if (!device) throw new HttpError(401, "This device isn't set up");
-    await touchDevice(context.env.DB, device.id);
+    // "Last seen" is nice to have; a failed write must not lock the owner out.
+    context.ctx.waitUntil(
+      touchDevice(context.env.DB, device.id).catch((err) => console.error("Could not update last seen", err))
+    );
     return handler({ ...context, device });
   };
 }
