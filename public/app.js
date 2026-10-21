@@ -119,6 +119,10 @@ function renderStats(stats) {
   $("opens").textContent = stats.opens;
   $("opens-label").textContent = stats.opens === 1 ? "open" : "opens";
 
+  $("visitors").textContent =
+    `About ${stats.visitors} unique ${stats.visitors === 1 ? "visitor" : "visitors"} in the last ${DAYS} days ` +
+    "(each device counted once a day)";
+
   const last = stats.lastOpen;
   $("last-open").textContent = last
     ? `Last opened ${timeAgo(last.clickedAt)} · ${[last.browser, place(last)].filter(Boolean).join(" · ")}`
